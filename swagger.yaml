@@ -1,0 +1,293 @@
+openapi: 3.0.0
+info:
+  title: ResponseCRM Site Builder API
+  version: 0.0.1
+  description: RESTful API for creating checkout funnels with ResponseCRM products
+servers:
+  - url: "https://sitebuilder.responsecrm.com/api"
+    description: Main API Server
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+    MetaModel:
+      type: object
+      properties:
+        page:
+          type: number
+          example: 1
+        pageSize:
+          type: number
+          example: 20
+          default: 20
+        totalItems:
+          type: number
+          example: 35
+        totalPages:
+          type: number
+          example: 2
+    SiteModel:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          readOnly: true
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    PageModel:
+      type: object
+      required:
+        - title
+      properties:
+        id:
+          readOnly: true
+          type: string
+        title:
+          type: string
+        path:
+          type: string
+        templateId:
+          type: string
+  parameters:
+    page:
+      name: page
+      in: query
+      description: Page of the list
+      schema:
+        $ref: "#/components/schemas/MetaModel/properties/page"
+    siteid:
+      name: siteid
+      required: true
+      in: path
+      description: ID of the site
+      schema:
+        type: string
+    pageid:
+      name: pageid
+      required: true
+      in: path
+      description: ID of the page
+      schema:
+        type: string
+  requestBodies:
+    SiteRequest:
+      description: "Site to update or add to the system"
+      content:
+        appliaction/json:
+          schema:
+            $ref: "#/components/schemas/SiteModel"
+    PageRequest:
+      description: "Page to update or add to the system"
+      content:
+        appliaction/json:
+          schema:
+            $ref: "#/components/schemas/PageModel"
+  responses:
+    NotFoundResponse:
+      description: "Not found error response"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorModel"
+    ConflictResponse:
+      description: "Conflict error response"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorModel"
+    SiteResponse:
+      description: "Site response body"
+      content:
+        appliaction/json:
+          schema:
+            $ref: "#/components/schemas/SiteModel"
+    PageResponse:
+      description: "Site response body"
+      content:
+        appliaction/json:
+          schema:
+            $ref: "#/components/schemas/PageModel"
+paths:
+  /sites:
+    summary: Manage your sites
+    description: Base path for managing sites
+    post:
+      summary: Create a new site
+      description: >-
+        Adds a new site to the system that can later be accessed from one of
+        your servers
+      operationId: Create Site
+      requestBody:
+        $ref: "#/components/requestBodies/SiteRequest"
+      responses:
+        201:
+          $ref: "#/components/responses/SiteResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+      tags:
+        - Sites
+    get:
+      summary: Get a list of sites
+      description: Returns a list of sites tied to the authenticated user's account
+      operationId: List Sites
+      parameters:
+        - $ref: "#/components/parameters/page"
+      responses:
+        200:
+          description: Site list response body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/MetaModel"
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SiteModel"
+      tags:
+        - Sites
+  /sites/{siteid}:
+    summary: Manage a specific site by ID
+    description: Operations for managing an individual site
+    parameters:
+      - $ref: "#/components/parameters/siteid"
+    get:
+      summary: Get an individual site
+      description: "Retrieves the specified `siteid` from your list of sites"
+      operationId: Get Site
+      responses:
+        200:
+          $ref: "#/components/responses/SiteResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+      tags:
+        - Sites
+    put:
+      summary: Create or update an individual site
+      description: >-
+        Default behavior: update the specified site. If the `siteid` is not
+        found, a new site will be created with the specified `siteid`
+      operationId: Save Site
+      requestBody:
+        $ref: "#/components/requestBodies/SiteRequest"
+      responses:
+        200:
+          $ref: "#/components/responses/SiteResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+      tags:
+        - Sites
+    delete:
+      summary: Delete an individual site
+      description: >-
+        Default behavior: permanently deletes the specified site.
+      operationId: Delete Site
+      responses:
+        204:
+          description: Site deleted
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+      tags:
+        - Sites
+  /sites/{siteid}/pages:
+    summary: Manage pages for a specific site
+    parameters:
+      - $ref: "#/components/parameters/siteid"
+      - $ref: "#/components/parameters/page"
+    post:
+      summary: Create a new page
+      description: >-
+        Adds a new site to the system that can later be accessed from one of
+        your servers
+      operationId: Create Page
+      requestBody:
+        $ref: "#/components/requestBodies/PageRequest"
+      responses:
+        201:
+          $ref: "#/components/responses/PageResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+      tags:
+        - Pages
+    get:
+      summary: Get a list of site pages
+      description: Returns a list of pages tied created on an individual site
+      operationId: List Pages
+      responses:
+        200:
+          description: Page list response body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/MetaModel"
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PageModel"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+      tags:
+        - Pages
+  /sites/{siteid}/pages/{pageid}:
+    summary: Manage a specific page on a site
+    description: Operations for managing an individual page
+    parameters:
+      - $ref: "#/components/parameters/siteid"
+      - $ref: "#/components/parameters/pageid"
+    get:
+      summary: Get an individual page
+      description: "Retrieves the specified `pageid` in `siteid`"
+      operationId: Get Page
+      responses:
+        200:
+          $ref: "#/components/responses/PageResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+      tags:
+        - Pages
+    put:
+      summary: Create or update an individual page
+      description: >-
+        Default behavior: update the specified page. If the `pageid` is not
+        found, a new page will be created with the specified `pageid`
+      operationId: Save Page
+      requestBody:
+        $ref: "#/components/requestBodies/PageRequest"
+      responses:
+        200:
+          $ref: "#/components/responses/PageResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+      tags:
+        - Pages
+    delete:
+      summary: Delete an individual page
+      description: >-
+        Default behavior: permanently deletes the specified page.
+      operationId: Delete Page
+      responses:
+        204:
+          description: Page deleted
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+      tags:
+        - Pages
+tags:
+  - name: Sites
+    description: "Site management API"
+  - name: Pages
+    description: "Page management API"
