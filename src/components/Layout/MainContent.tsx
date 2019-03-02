@@ -3,6 +3,7 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 import DummyComponent from "../Dummy/DummyComponent";
 import { AppContext } from "../../App.context";
+import SiteManagement from "../SiteManagement/SiteManagement";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -10,7 +11,9 @@ const styles = (theme: Theme) =>
       flexGrow: 1,
       zIndex: 1,
       backgroundColor: theme.palette.background.default,
-      minHeight: "calc(100vh - " + theme.spacing.unit * 8 + "px)"
+      minHeight: "calc(100vh - " + theme.spacing.unit * 8 + "px)",
+      maxWidth: theme.breakpoints.width("lg"),
+      margin: `${theme.spacing.unit * 2}px auto`
     },
     toolbar: theme.mixins.toolbar
   });
@@ -27,6 +30,7 @@ class MainContent extends React.Component<MainContentProps> {
         <main className={classes.root}>
           <div className={classes.toolbar} />
           <Switch>
+            <Route path="/sites" component={SiteManagement} />
             <Route path="*" component={DummyComponent} />
             {/* <AppContext.Consumer>
               {context => (
