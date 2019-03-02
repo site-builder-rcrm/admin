@@ -98,6 +98,11 @@ class SiteManagement extends React.Component<StyledComponentProps> {
     const classes = this.props.classes || {};
     return (
       <div className={classes.root}>
+        <Button size="large" color="primary" variant="outlined">
+          Create a New Site
+        </Button>
+        <br />
+        <br />
         {data.map(site => (
           <ExpansionPanel key={site.droplet}>
             <ExpansionPanelSummary
