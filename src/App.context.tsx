@@ -2,7 +2,7 @@ import React from "react";
 import UserProfile from "./types/user";
 
 export interface AppContextShape {
-  user?: UserProfile | null;
+  session?: any;
 }
 
 export const AppContext = React.createContext<AppContextShape>({});

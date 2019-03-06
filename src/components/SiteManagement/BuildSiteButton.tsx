@@ -6,13 +6,22 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import MenuItem from "@material-ui/core/MenuItem";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
 import { Link } from "react-router-dom";
 import {
   Typography,
   StyledComponentProps,
   withStyles,
   Theme,
-  createStyles
+  createStyles,
+  Divider,
+  Checkbox,
+  FormGroup
 } from "@material-ui/core";
 
 import Currency from "react-currency-formatter";
@@ -24,28 +33,49 @@ import {
   SizeValue,
   SizeOption
 } from "../../types/sites";
+import Sitebuilder from "../../services/Sitebuilder";
 
 interface BuildSiteButtonState {
   open: boolean;
+  domain: string;
   region: RegionValue | "";
   size: SizeValue | "";
+  whoisPrivacy: boolean;
+  autoRenew: boolean;
+  keyStrength: any;
+  cipherSuite: any;
 }
 
 const styles = (theme: Theme) =>
   createStyles({
     flex: {
       display: "flex"
+    },
+    formControlRow: {
+      display: "flex"
+    },
+    formControl: {
+      flex: 1
     }
   });
 
+interface BuildSiteButtonProps extends StyledComponentProps {
+  onSubmit: (newServerData: any) => void;
+}
+
 class BuildSiteButton extends React.Component<
-  StyledComponentProps,
+  BuildSiteButtonProps,
   BuildSiteButtonState
 > {
   public state: BuildSiteButtonState = {
     open: false,
+    whoisPrivacy: false,
+    autoRenew: false,
+    domain: "",
     region: "",
-    size: ""
+    size: "",
+    keyStrength: "",
+    cipherSuite: ""
   };
 
   handleClickOpen = () => {
@@ -56,11 +86,32 @@ class BuildSiteButton extends React.Component<
     this.setState({ open: false });
   };
 
-  handleRegionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ region: event.target.value as RegionValue });
+  handleSubmit = () => {
+    Sitebuilder.Servers.Create({
+      whoisPrivacy: this.state.whoisPrivacy,
+      autoRenew: this.state.autoRenew,
+      url: this.state.domain,
+      region: this.state.region,
+      size: this.state.size,
+      cipherstr: this.state.keyStrength,
+      ciphersuite: this.state.cipherSuite
+    }).then(response => {
+      this.props.onSubmit(response);
+      this.handleClose();
+    });
   };
-  handleSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ size: event.target.value as SizeValue });
+
+  public handleInputChangeFor = (inputName: string) => (
+    event: React.ChangeEvent<any>
+  ) => {
+    this.setState({
+      ...this.state,
+      [inputName]:
+        event.target.type === "checkbox"
+          ? event.target.checked
+          : event.target.value
+    });
+    console.log(this.state);
   };
 
   render() {
@@ -68,8 +119,8 @@ class BuildSiteButton extends React.Component<
     return (
       <div>
         <Button
-          variant="contained"
-          color="secondary"
+          variant="outlined"
+          color="primary"
           onClick={this.handleClickOpen}
         >
           Build New Site
@@ -83,21 +134,11 @@ class BuildSiteButton extends React.Component<
           <DialogContent>
             <TextField
               variant="outlined"
+              margin="dense"
               autoFocus
-              margin="dense"
-              placeholder="Your New Site"
-              helperText={
-                <Typography variant="caption" gutterBottom>
-                  Choose a recognizable name for your site
-                </Typography>
-              }
-              id="name"
-              label="Site Name"
-              fullWidth
-            />
-            <TextField
-              variant="outlined"
-              margin="dense"
+              required
+              value={this.state.domain}
+              onChange={this.handleInputChangeFor("domain")}
               placeholder="yourdomain.com"
               helperText={
                 <Typography variant="caption" gutterBottom>
@@ -111,12 +152,33 @@ class BuildSiteButton extends React.Component<
               label="Domain"
               fullWidth
             />
+            <FormGroup row>
+              <FormControlLabel
+                label="Who Is Privacy"
+                control={
+                  <Checkbox
+                    checked={this.state.whoisPrivacy}
+                    onChange={this.handleInputChangeFor("whoisPrivacy")}
+                  />
+                }
+              />
+              <FormControlLabel
+                label="Auto-Renew"
+                control={
+                  <Checkbox
+                    checked={this.state.autoRenew}
+                    onChange={this.handleInputChangeFor("autoRenew")}
+                  />
+                }
+              />
+            </FormGroup>
             <TextField
               variant="outlined"
               select
+              required
               margin="dense"
               value={this.state.region}
-              onChange={this.handleRegionChange}
+              onChange={this.handleInputChangeFor("region")}
               helperText={
                 <Typography variant="caption" gutterBottom>
                   Choose a region near your planned target audience.
@@ -137,9 +199,10 @@ class BuildSiteButton extends React.Component<
             <TextField
               variant="outlined"
               select
+              required
               margin="dense"
               value={this.state.size}
-              onChange={this.handleSizeChange}
+              onChange={this.handleInputChangeFor("size")}
               InputProps={{
                 classes: {
                   input: classes.flex
@@ -166,13 +229,70 @@ class BuildSiteButton extends React.Component<
                 )
               )}
             </TextField>
+            <FormGroup row>
+              <FormControl
+                className={classes.formControl}
+                margin="dense"
+                required
+              >
+                <FormLabel>Key Strength</FormLabel>
+                <RadioGroup
+                  aria-label="Security"
+                  name="security"
+                  className={classes.group}
+                  value={this.state.keyStrength}
+                  onChange={this.handleInputChangeFor("keyStrength")}
+                >
+                  <FormControlLabel
+                    value="4096"
+                    control={<Radio />}
+                    label="4096"
+                  />
+                  <FormControlLabel
+                    value="2048"
+                    control={<Radio />}
+                    label="2048 (Recommended)"
+                  />
+                </RadioGroup>
+              </FormControl>
+              <FormControl
+                className={classes.formControl}
+                margin="dense"
+                required
+              >
+                <FormLabel>Cipher Suite</FormLabel>
+                <RadioGroup
+                  aria-label="ciphersuite"
+                  name="ciphersuite"
+                  className={classes.group}
+                  value={this.state.cipherSuite}
+                  onChange={this.handleInputChangeFor("cipherSuite")}
+                >
+                  <FormControlLabel
+                    value="3"
+                    control={<Radio />}
+                    label="Strong"
+                  />
+                  <FormControlLabel
+                    value="2"
+                    control={<Radio />}
+                    label="Medium (Recommended)"
+                  />
+                  <FormControlLabel
+                    value="1"
+                    control={<Radio />}
+                    label="Weak"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </FormGroup>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="secondary">
               Cancel
             </Button>
             <Button
-              onClick={this.handleClose}
+              onClick={this.handleSubmit}
               color="primary"
               variant="contained"
             >

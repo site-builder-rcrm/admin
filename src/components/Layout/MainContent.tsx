@@ -5,6 +5,7 @@ import DummyComponent from "../Dummy/DummyComponent";
 import { AppContext } from "../../App.context";
 import SiteManagement from "../SiteManagement/SiteManagement";
 import SiteList from "../SiteManagement/SiteList";
+import Profile from "../Profile/Profile";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -34,15 +35,17 @@ class MainContent extends React.Component<MainContentProps> {
           <Switch>
             <Route path="/sites" component={SiteList} />
             <Route path="/site/:siteid" component={SiteManagement} />
-            <Route path="*" component={DummyComponent} />
-            {/* <AppContext.Consumer>
+            <AppContext.Consumer>
               {context => (
                 <Route
                   path="/profile"
-                  render={props => <Profile {...props} user={context.user} />}
+                  render={props => (
+                    <Profile {...props} session={context.session} />
+                  )}
                 />
               )}
-            </AppContext.Consumer> */}
+            </AppContext.Consumer>
+            <Route path="*" component={DummyComponent} />
           </Switch>
         </main>
       </Fade>

@@ -13,7 +13,8 @@ import AppHeader from "./components/Layout/AppHeader";
 import LeftDrawer from "./components/Layout/LeftDrawer";
 import MainContent from "./components/Layout/MainContent";
 import Login from "./components/Login/Login";
-import UserProfile from "./types/user";
+import Sitebuilder from "./services/Sitebuilder";
+import cache from "memory-cache";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -29,11 +30,7 @@ const styles = (theme: Theme) =>
       left: 0,
       right: 0,
       top: 0,
-      bottom: 0,
-      backgroundImage: 'url("/login_bg.jpg")',
-      backgroundPosition: "center",
-      backgroundSize: "cover",
-      backgroundRepeat: "no-repeat"
+      bottom: 0
     }
   });
 
@@ -50,10 +47,19 @@ class App extends React.Component<AppProps, AppState> {
   componentDidMount = () => {
     const { cookies } = this.props;
     if (cookies) {
-      this.startSession(cookies.get("session"));
-    } else {
-      this.setInitialState();
+      const sessionID = cookies.get("PHPSESSID");
+      if (sessionID) {
+        return Sitebuilder.GetUser()
+          .then(response => {
+            this.startSession(response);
+          })
+          .catch(err => {
+            cookies.remove("PHPSESSID");
+            this.setInitialState();
+          });
+      }
     }
+    this.setInitialState();
   };
 
   handleDrawerToggle = () => {
@@ -66,28 +72,36 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ mobileOpen: false, context: {} });
   };
 
-  startSession = async (session: UserProfile) => {
+  startSession = async (session: any) => {
     this.setState({
       context: {
-        user: session
+        session
       }
     });
   };
 
-  public handleLogin = (user: UserProfile) => {
+  public handleLogin = (response: any) => {
     const { cookies } = this.props;
     if (cookies) {
-      cookies.set("session", user);
+      if (cookies.get("PHPSESSID") !== response.session_id) {
+        cookies.set("PHPSESSID", response.session_id);
+      }
+      return this.startSession(response);
     }
-    this.startSession(user);
   };
 
   public handleLogout = () => {
-    const { cookies } = this.props;
-    if (cookies) {
-      cookies.remove("session");
-    }
-    this.setInitialState();
+    Sitebuilder.Logout()
+      .then(response => {
+        const { cookies } = this.props;
+        if (cookies) {
+          cookies.remove("PHPSESSID");
+        }
+        this.setInitialState();
+      })
+      .catch(error => {
+        console.log(error);
+      });
   };
 
   render() {
@@ -98,7 +112,7 @@ class App extends React.Component<AppProps, AppState> {
         <CssBaseline />
         <Router>
           {this.state ? (
-            this.state.context && this.state.context.user ? (
+            this.state.context && this.state.context.session ? (
               <AppContext.Provider value={this.state.context}>
                 <AppHeader
                   onLogout={this.handleLogout}
