@@ -6,6 +6,8 @@ import { AppContext } from "../../App.context";
 import SiteManagement from "../SiteManagement/SiteManagement";
 import SiteList from "../SiteManagement/SiteList";
 import Profile from "../Profile/Profile";
+import Products from "../Products/Products";
+import Response from "../Response/Response";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -35,6 +37,9 @@ class MainContent extends React.Component<MainContentProps> {
           <Switch>
             <Route path="/sites" component={SiteList} />
             <Route path="/site/:siteid" component={SiteManagement} />
+            {/* <Route path="/response-sites" component={ResponseSites}/> */}
+            <Route path="/response" exact component={Response} />
+            <Route path="/response/:siteid" exact component={Products} />
             <AppContext.Consumer>
               {context => (
                 <Route

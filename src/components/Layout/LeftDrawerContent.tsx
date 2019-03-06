@@ -31,7 +31,7 @@ const LeftDrawerContent: React.FunctionComponent = () => {
           activeIcon={<SitesIconActive />}
         />
         <ListItemNavLink
-          to="/products"
+          to="/response"
           primary="Products"
           icon={<ProductsIcon />}
           activeIcon={<ProductsIconActive />}

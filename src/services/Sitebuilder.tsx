@@ -7,10 +7,12 @@ class Sitebuilder {
     Create: (serverData: any) => JQuery.Promise<any>;
   };
   public Response: {
-    GetKey: () => JQuery.Promise<any>;
-    UpdateKey: (key: string) => JQuery.Promise<any>;
-    ListSites: (key: string) => JQuery.Promise<any>;
-    ListProducts: (key: string, siteId: string) => JQuery.Promise<any>;
+    ListSites: () => JQuery.Promise<any>;
+    ListProducts: (siteId: string) => JQuery.Promise<any>;
+  };
+  public Settings: {
+    Get: () => JQuery.Promise<any>;
+    Update: (settings: any) => JQuery.Promise<any>;
   };
   public Logout: () => JQuery.Promise<any>;
   public GetUser: () => JQuery.Promise<any>;
@@ -49,38 +51,40 @@ class Sitebuilder {
       });
     };
 
+    this.Settings = {
+      Get: () => {
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "GET",
+          url: "https://api.rcrm-site-builder.com/settings/"
+        });
+      },
+      Update: (settings: any) => {
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "POST",
+          url: "https://api.rcrm-site-builder.com/settings/",
+          data: settings
+        });
+      }
+    };
+
     this.Response = {
-      GetKey: () => {
+      ListSites: () => {
         return Jquery.ajax({
           ...defaultOptions,
           type: "GET",
-          url: "https://api.rcrm-site-builder.com/response/"
+          url: "https://api.rcrm-site-builder.com/response/sites/"
         });
       },
-      UpdateKey: (key: string) => {
-        return Jquery.ajax({
-          ...defaultOptions,
-          type: "GET",
-          url: "https://api.rcrm-site-builder.com/response/" + key + "/"
-        });
-      },
-      ListSites: (key: string) => {
-        return Jquery.ajax({
-          ...defaultOptions,
-          type: "GET",
-          url: "https://api.rcrm-site-builder.com/response/" + key + "/sites/"
-        });
-      },
-      ListProducts: (key: string, siteId: string) => {
+      ListProducts: (siteId: string) => {
         return Jquery.ajax({
           ...defaultOptions,
           type: "GET",
           url:
-            "https://api.rcrm-site-builder.com/response/" +
-            key +
-            "/sites/" +
+            "https://api.rcrm-site-builder.com/response/products:" +
             siteId +
-            "/products/"
+            "/"
         });
       }
     };
@@ -110,6 +114,7 @@ class Sitebuilder {
 }
 
 export default new Sitebuilder({
+  json: true,
   traditional: true,
   crossDomain: true,
   xhrFields: {
