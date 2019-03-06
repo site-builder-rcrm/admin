@@ -1,0 +1,34 @@
+[{
+        "name": "Another Site",
+        "domain": "anothersite.com",
+        "droplet": "134819833",
+        "ip": "198.322.105.65",
+        "price": 20,
+        "region": "New York 3",
+        "owner": "rwatt",
+        "status": 0,
+        "dateCreated": 1551407063000
+    },
+    {
+        "name": "Some Old Site",
+        "domain": "someoldsite.com",
+        "droplet": "134819820",
+        "ip": "198.111.105.33",
+        "price": 20,
+        "region": "New York 3",
+        "owner": "rwatt",
+        "status": 2,
+        "dateCreated": 1550407063000
+    },
+    {
+        "name": "My First Site",
+        "domain": "myfirstsite.com",
+        "droplet": "134819832",
+        "ip": "198.211.105.46",
+        "price": 20,
+        "region": "New York 1",
+        "owner": "mstedman",
+        "status": 1,
+        "dateCreated": 1551507063000
+    }
+]

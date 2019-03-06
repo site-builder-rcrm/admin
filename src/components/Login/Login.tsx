@@ -20,10 +20,11 @@ import { Visibility, VisibilityOff } from "@material-ui/icons";
 import LoginStyles from "./LoginStyles";
 import Alert from "../Alerts/Alert";
 import UserProfile from "../../types/user";
+import SiteBuilder from "../../services/Sitebuilder";
 
 interface LoginProps {
   classes: any;
-  onSubmit: (user: UserProfile) => void;
+  onSubmit: (response: any) => void;
 }
 
 export interface LoginState {
@@ -66,26 +67,23 @@ class Login extends Component<LoginProps, LoginState> {
   public handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     this.setState({ showForm: false });
-    this.props.onSubmit({
-      username: this.state.username,
-      firstName: "Mason",
-      lastName: "Stedman",
-      email: "mstedman@rcrm-site-builder.com",
-      phone: "(555) 555-5555"
-    });
+    SiteBuilder.Login(this.state.username, this.state.password)
+      .then(response => {
+        this.props.onSubmit(response);
+      })
+      .catch(this.handleError);
   };
 
   public handleCloseError = () => {
     this.setState({ showError: false });
   };
 
-  public handleError = (error: {
-    response: { body: { error_description: string } };
-  }) => {
+  public handleError = (error: any) => {
+    console.log("ERROR", error);
     this.setState({
       showForm: true,
       showError: true,
-      error: error.response.body.error_description
+      error: JSON.stringify(error, null, 2)
     });
   };
 
