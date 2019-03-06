@@ -14,7 +14,6 @@ import LeftDrawer from "./components/Layout/LeftDrawer";
 import MainContent from "./components/Layout/MainContent";
 import Login from "./components/Login/Login";
 import Sitebuilder from "./services/Sitebuilder";
-import cache from "memory-cache";
 
 const styles = (theme: Theme) =>
   createStyles({
