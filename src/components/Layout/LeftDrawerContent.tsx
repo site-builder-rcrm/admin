@@ -1,16 +1,16 @@
 import { List, Slide } from "@material-ui/core";
-import ComponentsIcon from "@material-ui/icons/CategoryOutlined";
-import ComponentsIconActive from "@material-ui/icons/CategoryTwoTone";
-import ProductsIcon from "@material-ui/icons/LocalOfferOutlined";
-import ProductsIconActive from "@material-ui/icons/LocalOfferTwoTone";
-import AdminToolsIcon from "@material-ui/icons/LockOutlined";
-import AdminToolsIconActive from "@material-ui/icons/LockTwoTone";
-import SitesIcon from "@material-ui/icons/StorageOutlined";
-import SitesIconActive from "@material-ui/icons/StorageTwoTone";
-import SettingsIcon from "@material-ui/icons/SettingsOutlined";
-import SettingsIconActive from "@material-ui/icons/SettingsTwoTone";
+import {
+  SignalWifi1BarOutlined,
+  SignalWifi1BarTwoTone
+} from "@material-ui/icons";
 import ProfileIcon from "@material-ui/icons/AccountCircleOutlined";
 import ProfileIconActive from "@material-ui/icons/AccountCircleTwoTone";
+import AdminToolsIcon from "@material-ui/icons/LockOutlined";
+import AdminToolsIconActive from "@material-ui/icons/LockTwoTone";
+import SettingsIcon from "@material-ui/icons/SettingsOutlined";
+import SettingsIconActive from "@material-ui/icons/SettingsTwoTone";
+import SitesIcon from "@material-ui/icons/StorageOutlined";
+import SitesIconActive from "@material-ui/icons/StorageTwoTone";
 import React from "react";
 import ListItemNavLink from "./ListItemNavLink";
 
@@ -20,27 +20,21 @@ const LeftDrawerContent: React.FunctionComponent = () => {
       <List>
         <ListItemNavLink
           to="/profile"
-          primary="My Profile"
+          primary="Profile"
           icon={<ProfileIcon />}
           activeIcon={<ProfileIconActive />}
         />
         <ListItemNavLink
           to="/sites"
-          primary="My Sites"
+          primary="Sites"
           icon={<SitesIcon />}
           activeIcon={<SitesIconActive />}
         />
         <ListItemNavLink
-          to="/response"
-          primary="Products"
-          icon={<ProductsIcon />}
-          activeIcon={<ProductsIconActive />}
-        />
-        <ListItemNavLink
-          to="/components"
-          primary="Components"
-          icon={<ComponentsIcon />}
-          activeIcon={<ComponentsIconActive />}
+          to="/funnels"
+          primary="Funnels"
+          icon={<SignalWifi1BarOutlined />}
+          activeIcon={<SignalWifi1BarTwoTone />}
         />
         <ListItemNavLink
           to="/settings"

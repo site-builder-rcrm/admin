@@ -1,13 +1,14 @@
-import { createStyles, Theme, withStyles, Fade } from "@material-ui/core";
+import { createStyles, Fade, Theme, withStyles } from "@material-ui/core";
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import DummyComponent from "../Dummy/DummyComponent";
 import { AppContext } from "../../App.context";
-import SiteManagement from "../SiteManagement/SiteManagement";
-import SiteList from "../SiteManagement/SiteList";
+import DummyComponent from "../Dummy/DummyComponent";
+import FunnelList from "../Funnels/FunnelList";
+import FunnelWizard from "../Funnels/FunnelWizard";
 import Profile from "../Profile/Profile";
-import Products from "../Products/Products";
-import Response from "../Response/Response";
+import SiteList from "../SiteManagement/SiteList";
+import SiteManagement from "../SiteManagement/SiteManagement";
+import FunnelDetails from "../Funnels/FunnelDetails";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -37,9 +38,9 @@ class MainContent extends React.Component<MainContentProps> {
           <Switch>
             <Route path="/sites" component={SiteList} />
             <Route path="/site/:siteid" component={SiteManagement} />
-            {/* <Route path="/response-sites" component={ResponseSites}/> */}
-            <Route path="/response" exact component={Response} />
-            <Route path="/response/:siteid" exact component={Products} />
+            <Route path="/funnels" exact component={FunnelList} />
+            <Route path="/funnels/create" exact component={FunnelWizard} />
+            <Route path="/funnels/:funnelid" exact component={FunnelDetails} />
             <AppContext.Consumer>
               {context => (
                 <Route
