@@ -1,39 +1,35 @@
-import React from "react";
+import {
+  Checkbox,
+  createStyles,
+  FormGroup,
+  StyledComponentProps,
+  Theme,
+  Typography,
+  withStyles
+} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
-import MenuItem from "@material-ui/core/MenuItem";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormLabel from "@material-ui/core/FormLabel";
+import MenuItem from "@material-ui/core/MenuItem";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import FormLabel from "@material-ui/core/FormLabel";
-import { Link } from "react-router-dom";
-import {
-  Typography,
-  StyledComponentProps,
-  withStyles,
-  Theme,
-  createStyles,
-  Divider,
-  Checkbox,
-  FormGroup
-} from "@material-ui/core";
-
+import TextField from "@material-ui/core/TextField";
+import React from "react";
 import Currency from "react-currency-formatter";
-
+import { Link } from "react-router-dom";
 import { REGION_OPTIONS, SIZE_OPTIONS } from "../../constants/sites";
-import {
-  RegionValue,
-  RegionOption,
-  SizeValue,
-  SizeOption
-} from "../../types/sites";
 import Sitebuilder from "../../services/Sitebuilder";
+import {
+  RegionOption,
+  RegionValue,
+  SizeOption,
+  SizeValue
+} from "../../types/sites";
 
 interface BuildSiteButtonState {
   open: boolean;
@@ -69,13 +65,13 @@ class BuildSiteButton extends React.Component<
 > {
   public state: BuildSiteButtonState = {
     open: false,
-    whoisPrivacy: false,
-    autoRenew: false,
+    whoisPrivacy: true,
+    autoRenew: true,
     domain: "",
     region: "",
-    size: "",
-    keyStrength: "",
-    cipherSuite: ""
+    size: "2gb",
+    keyStrength: "2048",
+    cipherSuite: "2"
   };
 
   handleClickOpen = () => {
@@ -137,6 +133,7 @@ class BuildSiteButton extends React.Component<
               margin="dense"
               autoFocus
               required
+              type="url"
               value={this.state.domain}
               onChange={this.handleInputChangeFor("domain")}
               placeholder="yourdomain.com"
@@ -145,7 +142,10 @@ class BuildSiteButton extends React.Component<
                   {`We will attempt to buy the provided domain and point it at a brand
               new A+ security rated server. Please ensure you have a connected
               name.com account in your `}
-                  <Link to="/profile">profile</Link>.
+                  <Link to="/profile" tabIndex={-1}>
+                    profile
+                  </Link>
+                  .
                 </Typography>
               }
               id="domain"
@@ -252,6 +252,11 @@ class BuildSiteButton extends React.Component<
                     value="2048"
                     control={<Radio />}
                     label="2048 (Recommended)"
+                  />
+                  <FormControlLabel
+                    value="1024"
+                    control={<Radio />}
+                    label="1024"
                   />
                 </RadioGroup>
               </FormControl>

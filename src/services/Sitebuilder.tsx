@@ -5,6 +5,14 @@ class Sitebuilder {
   public Servers: {
     List: () => JQuery.Promise<any>;
     Create: (serverData: any) => JQuery.Promise<any>;
+    Archive: (siteId: string) => JQuery.Promise<any>;
+  };
+  public Funnels: {
+    List: () => JQuery.Promise<any>;
+    Get: (funnelId: any) => JQuery.Promise<any>;
+    Create: (funnelData: any) => JQuery.Promise<any>;
+    Update: (funnelId: string, funnelData: any) => JQuery.Promise<any>;
+    Archive: (funnelId: string) => JQuery.Promise<any>;
   };
   public Response: {
     ListSites: () => JQuery.Promise<any>;
@@ -106,7 +114,71 @@ class Sitebuilder {
           url: "https://api.rcrm-site-builder.com/server/",
           data: serverData
         }).then(response => {
+          console.log("RAW RESPONSE", response);
           return JSON.parse(response);
+        });
+      },
+      Archive: (siteId: string) => {
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "DELETE",
+          url: "https://api.rcrm-site-builder.com/server/" + siteId + "/"
+        });
+      }
+    };
+
+    this.Funnels = {
+      List: () => {
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "GET",
+          url: "https://api.rcrm-site-builder.com/funnel/"
+        }).then(response => {
+          return JSON.parse(response);
+        });
+      },
+      Get: (funnelId: string) => {
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "GET",
+          url: "https://api.rcrm-site-builder.com/funnel/" + funnelId + "/"
+        }).then(response => {
+          return JSON.parse(response);
+        });
+      },
+      Create: (funnelData: any) => {
+        var data = {
+          name: funnelData.name,
+          json: JSON.stringify(funnelData)
+        };
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "POST",
+          url: "https://api.rcrm-site-builder.com/funnel/",
+          data: data
+        }).then(response => {
+          return JSON.parse(response);
+        });
+      },
+      Update: (funnelId: string, funnelData: any) => {
+        var data = {
+          name: funnelData.name,
+          json: JSON.stringify(funnelData)
+        };
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "POST",
+          url: "https://api.rcrm-site-builder.com/funnel/" + funnelId + "/",
+          data: data
+        }).then(response => {
+          return JSON.parse(response);
+        });
+      },
+      Archive: (funnelId: string) => {
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "DELETE",
+          url: "https://api.rcrm-site-builder.com/funnel/" + funnelId + "/"
         });
       }
     };

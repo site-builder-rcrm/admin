@@ -31,10 +31,6 @@ export const REGION_OPTIONS: RegionOptions = {
 };
 
 export const SIZE_OPTIONS: SizeOptions = {
-  Minimum: {
-    value: "512mb",
-    price: 5
-  },
   Small: {
     value: "1gb",
     price: 10

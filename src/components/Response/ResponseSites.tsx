@@ -16,7 +16,8 @@ import Sitebuilder from "../../services/Sitebuilder";
 const styles = (theme: Theme) =>
   createStyles({
     paper: {
-      marginBottom: theme.spacing.unit * 5
+      maxHeight: `calc(100vh - ${theme.spacing.unit * 36}px)`,
+      overflowY: "auto"
     }
   });
 
