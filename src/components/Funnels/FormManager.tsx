@@ -83,6 +83,7 @@ class FieldForm extends React.Component<any, any> {
               placeholder={`${property} field label`}
               onChange={this.handleInputChangeFor("label")}
             />
+            <div style={{ minWidth: 8 }} />
             <TextField
               variant="outlined"
               value={this.state.default}
@@ -90,6 +91,7 @@ class FieldForm extends React.Component<any, any> {
               placeholder={`${property} default value`}
               onChange={this.handleInputChangeFor("default")}
             />
+            <div style={{ minWidth: 8 }} />
             <FormControlLabel
               label="Required"
               control={
@@ -99,6 +101,7 @@ class FieldForm extends React.Component<any, any> {
                 />
               }
             />
+            <div style={{ minWidth: 8 }} />
             <FormControlLabel
               label="Hide"
               control={

@@ -38,6 +38,11 @@ const styles = (theme: Theme) =>
     flex: {
       display: "flex",
       alignItems: "center"
+    },
+    wizardButtons: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
     }
   });
 
@@ -75,9 +80,12 @@ class FunnelWizard extends React.Component<
   };
   public handleSiteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
-    this.setState({ site: event.target.value, group: "" });
     Sitebuilder.Response.ListProducts(event.target.value).then(groups => {
-      this.setState({ groupOptions: JSON.parse(groups) });
+      this.setState({
+        site: event.target.value,
+        group: "",
+        groupOptions: JSON.parse(groups)
+      });
     });
   };
   public handleGroupChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,6 +156,7 @@ class FunnelWizard extends React.Component<
           {activeStep === 0 && (
             <React.Fragment>
               <TextField
+                autoFocus
                 fullWidth
                 style={{ marginBottom: 16 }}
                 margin="normal"
@@ -181,69 +190,73 @@ class FunnelWizard extends React.Component<
                     groups.
                   </FormHelperText>
                 )}
-              {this.state.site && (
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  disabled={!Boolean(this.state.groupOptions.length)}
-                  placeholder="Select a Product Group"
-                  label="Product Group"
-                  value={this.state.group}
-                  select
-                  required
-                  InputProps={{
-                    classes: {
-                      input: classes.flex
-                    }
-                  }}
-                  onChange={this.handleGroupChange}
-                >
-                  {this.state.groupOptions.map(group => (
-                    <MenuItem key={group.ID} value={group.ID}>
-                      <Typography variant="body1">{group.Name}</Typography>
-                      <div className={classes.grow} />
-                      <Typography variant="caption" color="secondary">
-                        <code>{group.ProductGroupGUID}</code>
-                      </Typography>
-                      <div className={classes.spacer} />
-                      <Chip
-                        label={`${group.Charges.length} charge${
-                          group.Charges.length === 1 ? "" : "s"
-                        }`}
-                      />
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
+              <TextField
+                fullWidth
+                margin="normal"
+                variant="outlined"
+                disabled={!Boolean(this.state.groupOptions.length)}
+                placeholder="Select a Product Group"
+                label="Product Group"
+                value={this.state.group}
+                select
+                required
+                InputProps={{
+                  classes: {
+                    input: classes.flex
+                  }
+                }}
+                onChange={this.handleGroupChange}
+              >
+                {this.state.groupOptions.map(group => (
+                  <MenuItem key={group.ID} value={group.ID}>
+                    <span>{group.Name}</span>
+                    <div className={classes.grow} />
+                    <Typography variant="caption" color="secondary">
+                      <code>{group.ProductGroupGUID}</code>
+                    </Typography>
+                    <div className={classes.spacer} />
+                    <Typography variant="body2" color="primary">{`${
+                      group.Charges.length
+                    } charge${
+                      group.Charges.length === 1 ? "" : "s"
+                    }`}</Typography>
+                  </MenuItem>
+                ))}
+              </TextField>
               <br />
               <br />
               <Divider />
               <br />
-              <Button
-                variant="outlined"
-                color="primary"
-                disabled={
-                  !Boolean(
-                    this.state.name && this.state.site && this.state.group
-                  )
-                }
-                onClick={event => this.setState({ activeStep: 1 })}
-              >
-                Next
-              </Button>
+              <div className={classes.wizardButtons}>
+                <div className={classes.grow} />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={
+                    !Boolean(
+                      this.state.name && this.state.site && this.state.group
+                    )
+                  }
+                  onClick={event => this.setState({ activeStep: 1 })}
+                >
+                  Next
+                </Button>
+              </div>
             </React.Fragment>
           )}
           {activeStep === 1 && this.state.group && (
             <React.Fragment>
               <TextField
+                autoFocus
+                required
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                placeholder="Provide the URL where this step will be loaded (ex. '/shipping')"
+                placeholder="/shipping"
                 label="Step Location"
                 value={this.state.step1Location}
                 onChange={this.handleStep1LocationChange}
+                helperText="Provide the URL where this step will be loaded"
               />
               <br />
               <FormManager
@@ -254,31 +267,45 @@ class FunnelWizard extends React.Component<
               <br />
               <Divider />
               <br />
-              <Button
-                variant="outlined"
-                onClick={event => this.setState({ activeStep: 0 })}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={event => this.setState({ activeStep: 2 })}
-              >
-                Next
-              </Button>
+              <div className={classes.wizardButtons}>
+                <Button
+                  variant="outlined"
+                  onClick={event => this.setState({ activeStep: 0 })}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={
+                    !Boolean(
+                      this.state.name &&
+                        this.state.site &&
+                        this.state.group &&
+                        this.state.step1Location &&
+                        this.state.step1Fields
+                    )
+                  }
+                  onClick={event => this.setState({ activeStep: 2 })}
+                >
+                  Next
+                </Button>
+              </div>
             </React.Fragment>
           )}
           {activeStep === 2 && this.state.group && (
             <React.Fragment>
               <TextField
+                autoFocus
+                required
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                placeholder="Provide the URL where this step will be loaded (ex. '/billing')"
+                placeholder="/billing"
                 label="Step Location"
                 value={this.state.step2Location}
                 onChange={this.handleStep2LocationChange}
+                helperText="Provide the URL where this step will be loaded"
               />
               <br />
               <FormManager
@@ -289,20 +316,33 @@ class FunnelWizard extends React.Component<
               <br />
               <Divider />
               <br />
-              <Button
-                variant="outlined"
-                onClick={event => this.setState({ activeStep: 1 })}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={this.onSubmit}
-                component={(props: any) => <Link to="/funnels" {...props} />}
-              >
-                Finish
-              </Button>
+              <div className={classes.wizardButtons}>
+                <Button
+                  variant="outlined"
+                  onClick={event => this.setState({ activeStep: 1 })}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={this.onSubmit}
+                  disabled={
+                    !Boolean(
+                      this.state.name &&
+                        this.state.site &&
+                        this.state.group &&
+                        this.state.step1Location &&
+                        this.state.step2Location &&
+                        this.state.step1Fields &&
+                        this.state.step2Fields
+                    )
+                  }
+                  component={(props: any) => <Link to="/funnels" {...props} />}
+                >
+                  Finish
+                </Button>
+              </div>
             </React.Fragment>
           )}
         </Paper>

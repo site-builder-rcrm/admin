@@ -13,11 +13,12 @@ import {
   withStyles,
   Typography
 } from "@material-ui/core";
-import { Edit, Delete } from "@material-ui/icons";
+import { Edit, Delete, DeleteForever } from "@material-ui/icons";
 import React from "react";
 import { Link } from "react-router-dom";
 import Sitebuilder from "../../services/Sitebuilder";
 import moment from "moment";
+import ConfirmDialog from "../Alerts/ConfirmDialog";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -29,6 +30,10 @@ const styles = (theme: Theme) =>
 
 interface FunnelsState {
   funnels: Array<any>;
+  confirmTitle: string;
+  confirmMessage: string;
+  confirmOpen: boolean;
+  confirmCallback: (answer: any) => void;
 }
 
 export const mockData = [
@@ -57,11 +62,42 @@ export const mockData = [
 ];
 
 class FunnelList extends React.Component<StyledComponentProps, FunnelsState> {
-  componentDidMount = () => {
+  public getFunnelList = () => {
     Sitebuilder.Funnels.List().then(response => {
       this.setState({ funnels: response });
     });
   };
+
+  public componentDidMount = this.getFunnelList;
+
+  public negateFunnelStatus = (funnel: any, refresh: boolean) => (
+    event: React.MouseEvent
+  ) => {
+    this.setState({
+      confirmTitle: `${refresh ? "Archive Site" : "Permanently Delete"}`,
+      confirmMessage: `Are you sure you want to ${
+        refresh ? "archive" : "permanently delete"
+      } ${funnel.name}?`,
+      confirmOpen: true,
+      confirmCallback: (answer: any) => {
+        this.setState({ confirmOpen: false });
+        if (answer) {
+          Sitebuilder.Funnels.Archive(funnel.id).then(() => {
+            if (refresh) {
+              this.getFunnelList();
+            } else {
+              this.setState(state => {
+                return {
+                  funnels: state.funnels.filter(f => f.id !== funnel.id)
+                };
+              });
+            }
+          });
+        }
+      }
+    });
+  };
+
   public buttonLinkComponent = (funnelid: number) => (props: any) => (
     <Link to={`/funnels/${funnelid}`} {...props} />
   );
@@ -78,6 +114,12 @@ class FunnelList extends React.Component<StyledComponentProps, FunnelsState> {
           >
             Build New Funnel
           </Button>
+          <ConfirmDialog
+            open={this.state.confirmOpen}
+            onClose={this.state.confirmCallback}
+            message={this.state.confirmMessage}
+            title={this.state.confirmTitle}
+          />
           <br />
           <br />
           <Paper className={classes.paper}>
@@ -105,9 +147,21 @@ class FunnelList extends React.Component<StyledComponentProps, FunnelsState> {
                       >
                         <Edit />
                       </IconButton>
-                      <IconButton aria-label={`Edit ${funnel.name} Funnel`}>
-                        <Delete color="error" />
-                      </IconButton>
+                      {funnel.archived ? (
+                        <IconButton
+                          aria-label={`Delete ${funnel.name} Funnel`}
+                          onClick={this.negateFunnelStatus(funnel, false)}
+                        >
+                          <DeleteForever color="error" />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          aria-label={`Archive ${funnel.name} Funnel`}
+                          onClick={this.negateFunnelStatus(funnel, true)}
+                        >
+                          <Delete color="error" />
+                        </IconButton>
+                      )}
                     </ListItemSecondaryAction>
                   </ListItem>
                   {index !== this.state.funnels.length - 1 && <Divider />}

@@ -17,7 +17,7 @@ import { IconProps } from "@material-ui/core/Icon";
 const style = (theme: Theme) =>
   createStyles({
     activeIcon: {
-      color: theme.palette.primary.main
+      color: theme.palette.secondary.main
     }
   });
 

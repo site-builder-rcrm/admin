@@ -5,6 +5,7 @@ class Sitebuilder {
   public Servers: {
     List: () => JQuery.Promise<any>;
     Create: (serverData: any) => JQuery.Promise<any>;
+    AssignFunnel: (siteId: any, funnelId: string) => JQuery.Promise<any>;
     Archive: (siteId: string) => JQuery.Promise<any>;
   };
   public Funnels: {
@@ -116,6 +117,15 @@ class Sitebuilder {
         }).then(response => {
           console.log("RAW RESPONSE", response);
           return JSON.parse(response);
+        });
+      },
+      AssignFunnel: (siteId: string, funnelId: string) => {
+        return Jquery.ajax({
+          ...defaultOptions,
+          type: "PUT",
+          url:
+            "https://api.rcrm-site-builder.com/server/funnel:" + siteId + "/",
+          data: JSON.stringify({ id: funnelId })
         });
       },
       Archive: (siteId: string) => {

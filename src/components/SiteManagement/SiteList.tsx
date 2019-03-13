@@ -11,9 +11,14 @@ import {
   Link as UiLInk,
   StyledComponentProps,
   Theme,
-  Tooltip,
   Typography,
-  withStyles
+  withStyles,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Link,
+  IconButton
 } from "@material-ui/core";
 import { amber, blue, green, grey, red, teal } from "@material-ui/core/colors";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -23,12 +28,17 @@ import GlobeIcon from "@material-ui/icons/PublicTwoTone";
 import { findKey } from "lodash";
 import moment from "moment";
 import React from "react";
-import { REGION_OPTIONS } from "../../constants/sites";
+import { REGION_OPTIONS, SIZE_OPTIONS } from "../../constants/sites";
 import Sitebuilder from "../../services/Sitebuilder";
 import ConfirmDialog from "../Alerts/ConfirmDialog";
 import { GreyChip } from "../Styled/Chip";
 import BuildSiteButton from "./BuildSiteButton";
 import SiteStatus from "./SiteStatus";
+import { Storage, LocalOffer, FileCopyOutlined } from "@material-ui/icons";
+import Currency from "react-currency-formatter";
+import { Link as UiLink } from "react-router-dom";
+import CopyButton from "./CopyButton";
+import FunnelSelector from "../Funnels/FunnelSelector";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -111,6 +121,10 @@ class SiteList extends React.Component<StyledComponentProps, SiteListState> {
       .catch(error => {
         console.error("Server List Error", error);
       });
+  };
+
+  public onFunnelChange = (siteId: string) => (funnelId: string) => {
+    this.getSiteList();
   };
 
   public negateSiteAtStatus = (site: any, refresh: boolean) => (
@@ -210,64 +224,181 @@ class SiteList extends React.Component<StyledComponentProps, SiteListState> {
                     <SiteStatus status={site.status} />
                     <div className={classes.spacer} />
                   </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
+                  <ExpansionPanelDetails
+                    style={{ padding: site.status ? 0 : "" }}
+                  >
                     {site.status ? (
-                      <React.Fragment>
-                        <GreyChip
-                          className={classes.detailChip}
-                          label={site.droplet}
-                          avatar={
-                            <Avatar>
-                              <Tooltip placement="top" title="Droplet ID">
-                                <DropletIcon
-                                  classes={{ root: classes.dropletSvg }}
-                                />
-                              </Tooltip>
-                            </Avatar>
-                          }
-                        />
-                        <GreyChip
-                          className={classes.detailChip}
-                          label={site.ip}
-                          avatar={
-                            <Avatar>
-                              <Tooltip placement="top" title="IP Address">
-                                <span
-                                  style={{
-                                    textAlign: "center",
-                                    color: amber[500]
-                                  }}
+                      <Table>
+                        <colgroup>
+                          <col width="15%" />
+                        </colgroup>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell variant="head">Funnel</TableCell>
+                            <TableCell>
+                              {site.funnel && (
+                                <Link
+                                  component={(props: any) => (
+                                    <UiLink
+                                      {...props}
+                                      to={`/funnels/${site.funnel}`}
+                                    />
+                                  )}
                                 >
-                                  IP
-                                </span>
-                              </Tooltip>
-                            </Avatar>
-                          }
-                        />
+                                  {site.funnel_name}
+                                </Link>
+                              )}
+                              <FunnelSelector
+                                value={site.funnel}
+                                site={site.id}
+                                onChange={this.onFunnelChange(site.id)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell variant="head">Owner</TableCell>
+                            <TableCell>{site.creator}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell variant="head">Date Created</TableCell>
+                            <TableCell>
+                              {moment(site.created).format(
+                                "MM/DD/YYYY   h:mm a"
+                              )}
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell variant="head">Droplet ID</TableCell>
+                            <TableCell>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "flex-start",
+                                  alignItems: "center"
+                                }}
+                              >
+                                <span>{site.droplet}</span>
 
-                        <GreyChip
-                          className={classes.detailChip}
-                          label={findKey(REGION_OPTIONS, r => {
-                            return r.value === site.region;
-                          })}
-                          avatar={
-                            <Avatar>
-                              <Tooltip placement="top" title="Region">
-                                <GlobeIcon
-                                  classes={{ root: classes.globeSvg }}
-                                />
-                              </Tooltip>
-                            </Avatar>
-                          }
-                        />
-                        <div className={classes.grow} />
-                        <Typography variant="body2">{`Created by ${
-                          site.creator
-                        } on ${moment(site.created).format(
-                          "M/D/YYYY"
-                        )}`}</Typography>
-                      </React.Fragment>
-                    ) : site.build_step ? (
+                                <CopyButton text={site.droplet} />
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell variant="head">IP Address</TableCell>
+                            <TableCell>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "flex-start",
+                                  alignItems: "center"
+                                }}
+                              >
+                                <span>{site.ip}</span>
+
+                                <CopyButton text={site.ip} />
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell variant="head">Memory Size</TableCell>
+                            <TableCell>
+                              {Object.values(SIZE_OPTIONS)
+                                .filter(size => {
+                                  return size.price === site.price;
+                                })[0]
+                                .value.toLocaleUpperCase()}
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell variant="head">Monthly Cost</TableCell>
+                            <TableCell>
+                              <Currency quantity={site.price} />
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    ) : // <React.Fragment>
+                    //   <GreyChip
+                    //     className={classes.detailChip}
+                    //     label={site.droplet}
+                    //     avatar={
+                    //       <Avatar>
+                    //         <Tooltip placement="top" title="Droplet ID">
+                    //           <DropletIcon
+                    //             classes={{ root: classes.dropletSvg }}
+                    //           />
+                    //         </Tooltip>
+                    //       </Avatar>
+                    //     }
+                    //   />
+                    //   <GreyChip
+                    //     className={classes.detailChip}
+                    //     label={site.ip}
+                    //     avatar={
+                    //       <Avatar>
+                    //         <Tooltip placement="top" title="IP Address">
+                    //           <span
+                    //             style={{
+                    //               textAlign: "center",
+                    //               color: amber[500]
+                    //             }}
+                    //           >
+                    //             IP
+                    //           </span>
+                    //         </Tooltip>
+                    //       </Avatar>
+                    //     }
+                    //   />
+
+                    //   <GreyChip
+                    //     className={classes.detailChip}
+                    //     label={findKey(REGION_OPTIONS, r => {
+                    //       return r.value === site.region;
+                    //     })}
+                    //     avatar={
+                    //       <Avatar>
+                    //         <Tooltip placement="top" title="Region">
+                    //           <GlobeIcon
+                    //             classes={{ root: classes.globeSvg }}
+                    //           />
+                    //         </Tooltip>
+                    //       </Avatar>
+                    //     }
+                    //   />
+                    //   <GreyChip
+                    //     className={classes.detailChip}
+                    //     label={Object.values(SIZE_OPTIONS)
+                    //       .filter(size => {
+                    //         return size.price === site.price;
+                    //       })[0]
+                    //       .value.toLocaleUpperCase()}
+                    //     avatar={
+                    //       <Avatar>
+                    //         <Tooltip placement="top" title="Memory">
+                    //           <Storage color="secondary" />
+                    //         </Tooltip>
+                    //       </Avatar>
+                    //     }
+                    //   />
+                    //   <GreyChip
+                    //     className={classes.detailChip}
+                    //     label={<Currency quantity={site.price} />}
+                    //     avatar={
+                    //       <Avatar>
+                    //         <Tooltip placement="top" title="Monthly cost">
+                    //           <LocalOffer color="primary" />
+                    //         </Tooltip>
+                    //       </Avatar>
+                    //     }
+                    //   />
+                    //   <div className={classes.grow} />
+                    //   <Typography variant="body2">{`Created by ${
+                    //     site.creator
+                    //   } on ${moment(site.created).format(
+                    //     "M/D/YYYY"
+                    //   )}`}</Typography>
+                    // </React.Fragment>
+                    site.build_step ? (
                       <div style={{ width: "100%" }}>
                         <LinearProgress
                           classes={{

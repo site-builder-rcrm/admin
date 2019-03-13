@@ -138,15 +138,15 @@ class BuildSiteButton extends React.Component<
               onChange={this.handleInputChangeFor("domain")}
               placeholder="yourdomain.com"
               helperText={
-                <Typography variant="caption" gutterBottom>
+                <React.Fragment>
                   {`We will attempt to buy the provided domain and point it at a brand
-              new A+ security rated server. Please ensure you have a connected
-              name.com account in your `}
+                new A+ security rated server. Please ensure you have a connected
+                name.com account in your `}
                   <Link to="/profile" tabIndex={-1}>
                     profile
                   </Link>
                   .
-                </Typography>
+                </React.Fragment>
               }
               id="domain"
               label="Domain"
@@ -179,11 +179,7 @@ class BuildSiteButton extends React.Component<
               margin="dense"
               value={this.state.region}
               onChange={this.handleInputChangeFor("region")}
-              helperText={
-                <Typography variant="caption" gutterBottom>
-                  Choose a region near your planned target audience.
-                </Typography>
-              }
+              helperText="Choose a region near your planned target audience."
               id="region"
               label="Region"
               fullWidth
@@ -208,13 +204,9 @@ class BuildSiteButton extends React.Component<
                   input: classes.flex
                 }
               }}
-              helperText={
-                <Typography variant="caption" gutterBottom>
-                  Choose a size that accommodates the number of pages you plan
-                  on creating. Typically <b>Small</b> is enough space for a
-                  simple product funnel.
-                </Typography>
-              }
+              helperText="Choose a size that accommodates the number of pages you plan
+              on creating. Typically Medium is enough space for a
+              simple product funnel."
               id="size"
               label="Server Size"
               fullWidth
